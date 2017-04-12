@@ -9,7 +9,8 @@ var q = require('q');
 var includeFolder = require('include-folder');
 var expectedOutput = includeFolder(__dirname + '/expectedOutput', /.*\.xml$/);
 
-// Dates in XML files will always be this value.
+// Dates in XML files will always be this value, EXCEPT in the final
+// lastBuildDate override test.
 require('mockdate').set('Wed, 10 Dec 2014 19:04:57 GMT');
 
 test('empty feed', function(t) {
@@ -336,4 +337,19 @@ test('custom namespaces', function(t) {
     });
 
     t.equal(feed.xml({indent: true}), expectedOutput.customNamespaces);
+});
+
+test('lastBuildDate override', function(t) {
+    t.plan(1);
+
+    var feed = new RSS({
+        lastBuildDate: new Date(2012, 11, 21, 0, 0, 0, 0).toUTCString()
+        title: 'title',
+        description: 'description',
+        feed_url: 'http://example.com/rss.xml',
+        site_url: 'http://example.com',
+        hub: 'http://example.com/hub'
+    });
+
+    t.equal(feed.xml({indent: true}), expectedOutput.lastBuildDateOverride);
 });
